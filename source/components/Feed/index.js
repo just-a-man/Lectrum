@@ -19,6 +19,7 @@ export default class Feed extends Component {
 
         this._createPost = this._createPost.bind(this);
         this._setPostFetchingState = this._setPostFetchingState.bind(this);
+        this._deletePost = this._deletePost.bind(this);
         this._likePost = this._likePost.bind(this);
     }
 
@@ -43,20 +44,39 @@ export default class Feed extends Component {
             id:      getUniqueID(),
             created: moment().utc(),
             comment,
+            likes:   [],
         };
 
-        await delay(1200);
-        this.setState(({ posts }) => ({
-            posts:      [ post, ...posts ],
-            isSpinning: false,
-        }));
+        await delay(600);
+        this.setState(({ posts }) => {
+            return {
+                posts:      [ post, ...posts ],
+                isSpinning: false,
+            };
+        });
+    }
+
+    async _deletePost (id) {
+        this._setPostFetchingState(true);
+
+        await delay(600);
+
+        const updatedPosts = this.state.posts.filter((post) => {
+            return post.id !== id;
+        });
+        this.setState(() => {
+            return {
+                posts:      updatedPosts,
+                isSpinning: false,
+            };
+        });
     }
 
     async _likePost (id) {
         const { currentUserFirstName, currentUserLastName} = this.props;
         this._setPostFetchingState(true);
 
-        await delay(1200);
+        await delay(400);
 
         // eslint-disable-next-line react/no-access-state-in-setstate
         const newPosts = this.state.posts.map((post) => {
@@ -90,6 +110,7 @@ export default class Feed extends Component {
                 <Post
                     key = { post.id }
                     { ...post }
+                    _deletePost = { this._deletePost }
                     _likePost = { this._likePost }
                 />
             );

@@ -1,14 +1,13 @@
-.post{
+.post {
     position: relative;
     width: 500px;
     margin-top: 10px;
     padding: 12px;
-    border: 1px solid var(--paletteColor3);
     border-radius: 3px;
-    background-color:var(--paletteColor2);
+    background-color: var(--paletteColor2);
     word-wrap: break-word;
 
-    & img{
+    & img {
         width: 40px;
         height: 40px;
         margin-right: 15px;
@@ -16,40 +15,40 @@
         border-radius: 50%;
         cursor: pointer;
     }
-    
+
     & a,
-    & time{
+    & time {
         position: absolute;
         left: 60px;
         text-decoration: none;
         cursor: pointer;
 
-        &:hover{
+        &:hover {
             text-decoration: underline;
         }
     }
-    
-    & a{
+
+    & a {
         top: 15px;
         color: var(--paletteColor7);
         font-weight: 700;
     }
-    
-    & time{
+
+    & time {
         top: 35px;
         color: var(--paletteColor5);
         font-size: 12px;
     }
-    
-    & p{
+
+    & p {
         margin-top: 16px;
         font-size: 14px;
     }
-    
-    .cross{
+
+    & .cross {
         content: '';
         position: absolute;
-        top:12px;
+        top: 12px;
         right: 12px;
         width: 10px;
         height: 10px;
@@ -57,7 +56,7 @@
         background-repeat: no-repeat;
         cursor: pointer;
 
-        &:hover{
+        &:hover {
             background-position: -13px 0;
         }
     }
