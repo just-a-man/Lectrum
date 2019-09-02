@@ -4,6 +4,7 @@ import moment from 'moment';
 
 //Components
 import { withProfile } from 'components/HOC/withProfile';
+import Catcher from 'components/Catcher';
 import StatusBar from 'components/StatusBar';
 import Composer from 'components/Composer';
 import Post from 'components/Post';
@@ -12,6 +13,7 @@ import Spinner from 'components/Spinner';
 //Instruments
 import Styles from './styles.m.css';
 import { getUniqueID, delay } from 'instruments';
+import { api } from 'config/api';
 
 @withProfile
 export default class Feed extends Component {
@@ -26,6 +28,21 @@ export default class Feed extends Component {
     _setPostFetchingState = (state) => {
         this.setState({
             isSpinning: state,
+        });
+    }
+
+    _fetchPosts = async () => {
+        this._setPostFetchingState(true);
+
+        const response = await fetch(api, {
+            method: 'GET',
+        });
+
+        const {data: posts } = await response.json();
+
+        this.setState({
+            posts,
+            isSpinning: false,
         });
     }
 
@@ -99,12 +116,13 @@ export default class Feed extends Component {
 
           const postsJSX = posts.map((post) =>{
               return (
-                  <Post
-                      key = { post.id }
-                      { ...post }
-                      _deletePost = { this._deletePost }
-                      _likePost = { this._likePost }
-                  />
+                  <Catcher key = { post.id }>
+                      <Post
+                          { ...post }
+                          _deletePost = { this._deletePost }
+                          _likePost = { this._likePost }
+                      />
+                  </Catcher>
               );
           });
 
