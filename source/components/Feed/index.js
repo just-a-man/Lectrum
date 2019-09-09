@@ -1,6 +1,5 @@
 //Core
 import React, {Component} from 'react';
-import moment from 'moment';
 
 //Components
 import { withProfile } from 'components/HOC/withProfile';
@@ -12,8 +11,7 @@ import Spinner from 'components/Spinner';
 
 //Instruments
 import Styles from './styles.m.css';
-import { getUniqueID, delay } from 'instruments';
-import { api } from 'config/api';
+import { api, TOKEN } from 'config/api';
 
 @withProfile
 export default class Feed extends Component {
@@ -24,6 +22,10 @@ export default class Feed extends Component {
         ],
         isSpinning: false,
     };
+
+    componentDidMount () {
+        this._fetchPosts();
+    }
 
     _setPostFetchingState = (state) => {
         this.setState({
@@ -49,14 +51,16 @@ export default class Feed extends Component {
      _createPost = async (comment) => {
          this._setPostFetchingState(true);
 
-         const post = {
-             id:      getUniqueID(),
-             created: moment().utc(),
-             comment,
-             likes:   [],
-         };
+         const response = await fetch(api, {
+             method:  'POST',
+             headers: {
+                 'Content-Type': 'application/json',
+                 Authorization:  TOKEN,
+             },
+             body: JSON.stringify({comment}),
+         });
 
-         await delay(600);
+         const { data: post } = await response.json();
          this.setState(({ posts }) => {
              return {
                  posts:      [ post, ...posts ],
@@ -68,48 +72,38 @@ export default class Feed extends Component {
       _deletePost = async (id) => {
           this._setPostFetchingState(true);
 
-          await delay(600);
+          await fetch(`${api}/${id}`, {
+              method:  'DELETE',
+              headers: {
+                  Authorization: TOKEN,
+              },
+          });
 
-          const updatedPosts = this.state.posts.filter((post) => {
-              return post.id !== id;
-          });
-          this.setState(() => {
-              return {
-                  posts:      updatedPosts,
-                  isSpinning: false,
-              };
-          });
-      }
+          this.setState(({ posts }) => ({
+              posts:      posts.filter((post) => post.id !== id),
+              isSpinning: false,
+          }));
+      };
 
       _likePost = async (id) => {
-          const { currentUserFirstName, currentUserLastName} = this.props;
           this._setPostFetchingState(true);
 
-          await delay(400);
-
-          // eslint-disable-next-line react/no-access-state-in-setstate
-          const newPosts = this.state.posts.map((post) => {
-              if (post.id === id) {
-                  return {
-                      ...post,
-                      likes: [
-                          {
-                              id:        getUniqueID(),
-                              firstName: currentUserFirstName,
-                              lastName:  currentUserLastName,
-                          },
-                      ],
-                  };
-              }
-
-              return post;
+          const response = await fetch(`${api}/${id}`, {
+              method:  'PUT',
+              headers: {
+                  Authorization: TOKEN,
+              },
           });
 
-          this.setState({
-              posts:      newPosts,
+          const { data: likedPost} = await response.json();
+
+          this.setState(({ posts }) => ({
+              posts: posts.map(
+                  (post) => post.id === likedPost.id ? likedPost : post,
+              ),
               isSpinning: false,
-          });
-      }
+          }));
+      };
 
       render () {
           const { posts, isSpinning } = this.state;
