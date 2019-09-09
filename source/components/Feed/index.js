@@ -11,20 +11,52 @@ import Spinner from 'components/Spinner';
 
 //Instruments
 import Styles from './styles.m.css';
-import { api, TOKEN } from 'config/api';
+import { api, TOKEN, GROUP_ID } from 'config/api';
+import { socket } from 'socket/init';
 
 @withProfile
 export default class Feed extends Component {
     state = {
-        posts: [
-            {id: '1', comment: 'The first comment', created: 1526825076849, likes: []},
-            {id: '2', comment: 'The second comment', created: 1526825098999, likes: []},
-        ],
+        posts:      [],
         isSpinning: false,
     };
 
     componentDidMount () {
+        const { currentUserFirstName, currentUserLastName } = this.props;
+
         this._fetchPosts();
+        socket.emit('join', GROUP_ID);
+
+        socket.on('create', (postJSON) => {
+            const { data: createdPost, meta } = JSON.parse(postJSON);
+
+            if (
+                `${currentUserFirstName} ${currentUserLastName}`
+                !== `${meta.authorFirstName} ${meta.authorLastName}`
+            ) {
+                this.setState(({ posts }) => ({
+                    posts: [ createdPost, ...posts ],
+                }));
+            }
+        });
+
+        socket.on('remove', (postJSON) => {
+            const { data: removedPost, meta } = JSON.parse(postJSON);
+
+            if (
+                `${currentUserFirstName} ${currentUserLastName}`
+                !== `${meta.authorFirstName} ${meta.authorLastName}`
+            ) {
+                this.setState(({ posts }) => ({
+                    posts: posts.filter((post) => post.id !== removedPost.id),
+                }));
+            }
+        });
+    }
+
+    componentWillUnmount () {
+        socket.removeListener('create');
+        socket.removeListener('remove');
     }
 
     _setPostFetchingState = (state) => {
