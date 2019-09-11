@@ -52,6 +52,27 @@ export default class Feed extends Component {
                 }));
             }
         });
+
+        socket.on('like', (postJSON) => {
+            const { data, meta } = JSON.parse(postJSON);
+
+            if (
+                `${currentUserFirstName} ${currentUserLastName}`
+                !== `${meta.authorFirstName} ${meta.authorLastName}`
+            ) {
+                this.setState(({ posts }) => ({
+                    posts: posts.map(
+                        (post) => {
+                            if (post.id === data.id) {
+                                post.likes = data.likes;
+                            }
+
+                            return post;
+                        },
+                    ),
+                }));
+            }
+        });
     }
 
     componentWillUnmount () {

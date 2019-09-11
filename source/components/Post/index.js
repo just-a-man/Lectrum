@@ -31,7 +31,10 @@ export default class Post extends Component {
         const { firstName, lastName, currentUserFirstName, currentUserLastName } = this.props;
 
         return `${firstName} ${lastName}` === `${currentUserFirstName} ${currentUserLastName}` ? (
-            <span className = { Styles.cross } onClick =  { this._deletePost } />) : null;
+            <span
+                className = { Styles.cross }
+                onClick =  { this._deletePost }
+            />) : null;
     };
 
     render () {
