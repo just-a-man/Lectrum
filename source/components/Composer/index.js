@@ -19,7 +19,6 @@ export default class Composer extends Component {
     };
 
     _updateComment = (event) => {
-        console.log(event);
         this.setState({
             comment: event.target.value,
         });
