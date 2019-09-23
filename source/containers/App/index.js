@@ -5,6 +5,7 @@ import { hot } from 'react-hot-loader';
 //Components
 import Catcher from 'components/Catcher';
 import Feed from 'components/Feed';
+import Profile from 'components/Profile';
 import { Provider } from 'components/HOC/withProfile';
 
 //Instruments
@@ -22,7 +23,8 @@ export default class App extends Component {
         return (
             <Catcher>
                 <Provider value = { options }>
-                    <Feed />;
+                    <Feed />
+                    <Profile />
                 </Provider>
             </Catcher>
         );
